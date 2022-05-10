@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'
 import { getLocalFile } from '../utils/getLocalFile'
 
 export const Home = () => {
-  const [info, setInfo] = useState<FrameInfo | null>(null)
+  const [info, setInfo] = useState<VideoInfo | null>(null)
   const imgRef = useRef<HTMLImageElement>(null)
-  const interval = useRef(null)
+  const interval = useRef<ReturnType<typeof setInterval> | null>(null)
   const [type, setType] = useStoredState<string>('elementType', 'pyro')
 
   useEffect(() => {
@@ -16,12 +16,16 @@ export const Home = () => {
     imgRef.current.height = frame_height / 2
     if (interval.current) clearInterval(interval.current)
     window.eel.set_frame(0)
-    setInterval(() => {
-      window.eel.get_frame()((frame: string) => {
+    interval.current = setInterval(() => {
+      window.eel.get_frame()((frame: FrameData) => {
         if (!imgRef.current || !frame) return
-        imgRef.current.src = frame
+        imgRef.current.src = frame.frame
       })
     }, 1000 / fps)
+
+    return () => {
+      if (interval.current) clearInterval(interval.current)
+    }
   }, [info])
 
   return (
@@ -33,7 +37,7 @@ export const Home = () => {
         onClick={() => {
           getLocalFile().then(info => {
             console.log(info)
-            setInfo(info as FrameInfo)
+            setInfo(info as VideoInfo)
           })
         }}
         accept=".mp4"
@@ -57,7 +61,7 @@ export const Home = () => {
           </select>
         </label>
       </div>
-      <img ref={imgRef} alt="video-preview" />
+      <img ref={imgRef} alt="video-preview" width="1920" height="1080" />
       <Link to="/result">Analyze</Link>
     </div>
   )
