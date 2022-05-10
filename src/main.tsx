@@ -1,11 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './App'
 import './index.css'
+import { GUIRouter } from './GUIRouter'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <GUIRouter />
   </React.StrictMode>,
   document.getElementById('root')
 )
