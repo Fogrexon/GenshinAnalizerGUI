@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Genshin Damage Detector</title>
-    <script type="text/javascript" src="/eel.js"></script>
+    <script type="text/javascript" src="eel.js"></script>
+    <script>
+      window.progressTarget = new EventTarget()
+      eel.expose(progress)
+      function progress(num) {
+        console.log(num)
+        window.progressTarget.dispatchEvent(
+          new CustomEvent('progress', { detail: num })
+        )
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

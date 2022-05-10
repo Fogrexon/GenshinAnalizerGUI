@@ -1,20 +1,13 @@
+import { useStoredState } from '#/utils/hooks'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getLocalFile } from '../utils/getLocalFile'
-
-interface FrameInfo {
-  path: string
-  fps: number
-  frame_count: number
-  frame_width: number
-  frame_height: number
-  frame_index: number
-}
 
 export const Home = () => {
   const [info, setInfo] = useState<FrameInfo | null>(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const interval = useRef(null)
+  const [type, setType] = useStoredState<string>('elementType', 'pyro')
 
   useEffect(() => {
     if (!info || !imgRef.current) return
@@ -45,8 +38,27 @@ export const Home = () => {
         }}
         accept=".mp4"
       />
+      <div>
+        <label htmlFor="elementType">
+          ダメージの元素タイプ:
+          <select
+            id="element-type"
+            name="elementType"
+            value={type}
+            onChange={e => setType(e.target.value)}
+          >
+            <option value="pyro">Pyro</option>
+            <option value="cyro">Cyro</option>
+            <option value="electro">Electro</option>
+            <option value="geo">Geo</option>
+            <option value="hydro">Hydro</option>
+            <option value="anemo">Anemo</option>
+            <option value="physical">Physical</option>
+          </select>
+        </label>
+      </div>
       <img ref={imgRef} alt="video-preview" />
-      <Link to="/loading">Analyze</Link>
+      <Link to="/result">Analyze</Link>
     </div>
   )
 }
