@@ -1,42 +1,42 @@
-import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
+import react from '@vitejs/plugin-react'
 
-const cpctfBaseUrl = "https://cpctf.space";
+const cpctfBaseUrl = 'https://cpctf.space'
 
 export default defineConfig({
-  base: process.env.BUILD_BASE_PATH || "/",
+  base: process.env.BUILD_BASE_PATH || '/',
   build: {
-    outDir: "./build",
+    outDir: './app'
   },
   resolve: {
     alias: {
-      "#/": `${__dirname}/src/`,
-    },
+      '#/': `${__dirname}/src/`
+    }
   },
   plugins: [react(), tsconfigPaths()],
   server: {
     proxy: {
-      "/api": {
+      '/api': {
         target: cpctfBaseUrl,
-        changeOrigin: true,
+        changeOrigin: true
       },
-      "/ws": {
+      '/ws': {
         target: cpctfBaseUrl,
         changeOrigin: true,
         ws: true,
         headers: {
-          origin: cpctfBaseUrl,
-        },
+          origin: cpctfBaseUrl
+        }
       },
-      "/images": {
+      '/images': {
         target: cpctfBaseUrl,
-        changeOrigin: true,
+        changeOrigin: true
       },
-      "/visualizer/circuit.json": {
+      '/visualizer/circuit.json': {
         target: cpctfBaseUrl,
-        changeOrigin: true,
-      },
-    },
-  },
-});
+        changeOrigin: true
+      }
+    }
+  }
+})
