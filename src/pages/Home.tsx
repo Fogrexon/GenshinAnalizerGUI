@@ -10,14 +10,19 @@ export const Home = () => {
   const [type, setType] = useStoredState<string>('elementType', 'pyro')
 
   useEffect(() => {
+    setType('pyro')
     if (!info || !imgRef.current) return
     const { fps, frame_width, frame_height } = info
     imgRef.current.width = frame_width / 2
     imgRef.current.height = frame_height / 2
     if (interval.current) clearInterval(interval.current)
     window.eel.set_frame(0)
+    let blocking = false
     interval.current = setInterval(() => {
+      if (blocking) return
+      blocking = true
       window.eel.get_frame()((frame: FrameData) => {
+        blocking = false
         if (!imgRef.current || !frame) return
         imgRef.current.src = frame.frame
       })

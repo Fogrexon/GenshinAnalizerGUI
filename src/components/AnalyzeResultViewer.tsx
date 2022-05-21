@@ -1,5 +1,17 @@
 import { useEffect, useRef } from 'react'
 
+const enemy2Color: Record<string, string> = {
+  cyroreg: '#66ffff',
+  andrius: '#5599ff',
+  rhodeia: '#ddddff',
+  geovishap: '#aaff88',
+  pyroreg: '#ff8888',
+  mechanicalarray: '#994444',
+  maguukenki: '#22ff99',
+  thundermanifestation: '#cc55ff',
+  wolfloard: '#dddd33'
+}
+
 const showCanvas = (canvas: HTMLCanvasElement, result: AnalyzeResult) => {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
@@ -12,10 +24,8 @@ const showCanvas = (canvas: HTMLCanvasElement, result: AnalyzeResult) => {
     frame_height
   } = result
   const { width, height } = canvas
-  const maxDamage = result.damages.reduce(
-    (prev, value) => Math.max(prev, value.total),
-    0
-  )
+
+  // seeking
   window.eel.set_frame(0)
   let blocking = false
   const mousemoveHandler = (event: MouseEvent) => {
@@ -26,13 +36,38 @@ const showCanvas = (canvas: HTMLCanvasElement, result: AnalyzeResult) => {
       blocking = false
     })
   }
-
   canvas.addEventListener('mousemove', mousemoveHandler)
 
+  // drawing
+  const maxDamage = result.damages.reduce(
+    (prev, value) => Math.max(prev, value.total),
+    0
+  )
+  const damageRates = result.damages.map(({ total }) => total / maxDamage)
+  for (let i = 0; i < 50; i++) {
+    for (let j = 1; j < damageRates.length - 1; j++) {
+      const prev = damageRates[j - 1]
+      let curr = damageRates[j]
+      const next = damageRates[j + 1]
+      if (prev > curr) {
+        if (next > curr) {
+          curr = ((prev + next) / 2) * 0.9
+        } else {
+          curr = prev * 0.9
+        }
+      } else if (next > curr) {
+        curr = next * 0.9
+      }
+      damageRates[j] = curr
+    }
+  }
+
+  let frameBlocking = false
   const animation = setInterval(() => {
+    if (frameBlocking) return
+    frameBlocking = true
     window.eel.get_frame()(({ frame, current }: FrameData) => {
       if (!frame) return
-      console.log(current)
       const image = new Image()
       image.onload = () => {
         ctx.clearRect(0, 0, width, height)
@@ -43,13 +78,13 @@ const showCanvas = (canvas: HTMLCanvasElement, result: AnalyzeResult) => {
         ctx.fillStyle = 'red'
         ctx.beginPath()
         ctx.moveTo(0, height)
-        result.damages.map(({ total }, index) => {
+        damageRates.map((rate, index) => {
           ctx.lineTo(
-            (width * index) / result.damages.length,
-            height - ((height * total) / maxDamage) * 0.5
+            (width * index) / damageRates.length,
+            height - height * rate * 0.5
           )
         })
-        ctx.moveTo(width, height)
+        ctx.lineTo(width, height)
         ctx.fill()
 
         const damageFrame = Math.floor(current / damage_dropout)
@@ -70,7 +105,7 @@ const showCanvas = (canvas: HTMLCanvasElement, result: AnalyzeResult) => {
         const enemy = result.enemies[enemyFrame]
         if (enemy.type !== 'none') {
           const [x1, y1, x2, y2] = enemy.bbox
-          ctx.strokeStyle = 'green'
+          ctx.strokeStyle = enemy2Color[enemy.type] ?? 'green'
           ctx.lineWidth = 4
           ctx.strokeRect(
             (x1 / frame_width) * width,
@@ -80,7 +115,8 @@ const showCanvas = (canvas: HTMLCanvasElement, result: AnalyzeResult) => {
           )
           ctx.font = '40px serif'
           ctx.lineWidth = 1
-          ctx.strokeText(
+          ctx.fillStyle = enemy2Color[enemy.type] ?? 'green'
+          ctx.fillText(
             enemy.type,
             (x1 / frame_width) * width,
             (y2 / frame_height) * height
@@ -96,6 +132,7 @@ const showCanvas = (canvas: HTMLCanvasElement, result: AnalyzeResult) => {
         ctx.stroke()
       }
       image.src = frame
+      frameBlocking = false
     })
   }, 1000 / fps)
 

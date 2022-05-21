@@ -10,7 +10,6 @@
       window.progressTarget = new EventTarget()
       eel.expose(progress)
       function progress(num) {
-        console.log(num)
         window.progressTarget.dispatchEvent(
           new CustomEvent('progress', { detail: num })
         )

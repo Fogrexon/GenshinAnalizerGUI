@@ -24,11 +24,11 @@ export const Result = () => {
       {result ? (
         <div>
           <AnalyzeResultViewer result={result} />
+          <Link to="/">Back to Home</Link>
         </div>
       ) : (
         <div>Analyzing...{Math.floor(progress * 100)}%</div>
       )}
-      <Link to="/">Back to Home</Link>
     </div>
   )
 }
