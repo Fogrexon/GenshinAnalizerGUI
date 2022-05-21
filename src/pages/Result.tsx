@@ -8,8 +8,8 @@ export const Result = () => {
   const [progress, setProgress] = useState(0)
   useEffect(() => {
     window.progressTarget.addEventListener('progress', (({
-      detail: { progress }
-    }: CustomEvent<{ progress: number }>) => {
+      detail: progress
+    }: CustomEvent<number>) => {
       setProgress(progress)
     }) as EventListener)
     window.eel.analyze(SimpleStore.get<string>('elementType') ?? 'pyro')(
@@ -24,11 +24,11 @@ export const Result = () => {
       {result ? (
         <div>
           <AnalyzeResultViewer result={result} />
+          <Link to="/">Back to Home</Link>
         </div>
       ) : (
-        <div>loading...{Math.floor(progress * 100)}%</div>
+        <div>Analyzing...{Math.floor(progress * 100)}%</div>
       )}
-      <Link to="/">Back to Home</Link>
     </div>
   )
 }

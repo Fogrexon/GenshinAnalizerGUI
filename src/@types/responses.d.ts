@@ -1,4 +1,4 @@
-interface FrameInfo {
+interface VideoInfo {
   path: string
   fps: number
   frame_count: number
@@ -26,4 +26,9 @@ interface AnalyzeResult {
     type: string
     score: number
   }[]
+}
+
+interface FrameData {
+  frame: string
+  current: number
 }
